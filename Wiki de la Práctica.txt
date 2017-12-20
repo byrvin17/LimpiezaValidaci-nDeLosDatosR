@@ -3,9 +3,9 @@ Correo: bvlima@uoc.edu
 
 Descripción de archivos:
 
-Informe_LimpiezaValidaciónDeDatos: informe con respuesta a cada enunciado.
+LimpiezaValidacionDeDatos: informe con respuesta a cada enunciado.
 
-Informe_LimpiezaValidaciónDeDatos.Rmd: Código de la práctica.
+LimpiezaValidacionDeDatos.Rmd: Código de la práctica.
 
 vgsales: Conjunto de datos inicial https://www.kaggle.com/farisai/predict-videogames-sales/data. 
 
