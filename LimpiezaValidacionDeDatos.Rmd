@@ -421,31 +421,71 @@ A continuación procedemos con la gráficación de las tres variables más influyent
 
 **Análisis de datos mediante gráficas**
 
-
-
-
 ```{r,eval=TRUE,echo=TRUE}
+#Detalle de ventas por género de cada videojuego
 plot(videogamesnewS$Genre, videogamesnewS$Global_Sales, col="blue", 
-     main = 'Diagrama de análisis de videojuegos por Género')
+     main = 'Diagrama de análisis de videojuegos por Género',
+     ylab="Ventas por millones", xlab="Clasificación por género",cex.axis=0.4,cex=0.4)
+#Detalle global de ventas por cada género de videojuego
+barplot(GenreVideoGames,cex.axis=0.4,cex=0.4)
 ```
 
-**Conclusión:** De acuerdo a la revisión de valores por género se puede decir que existen valores atípicos, pero al tratarse de ventas por unidad de video juego única en el conjunto de datos se puede deducir aquellos géneros en videojuegos que triunfaron en el mercado, pero más allá no puede determinar el éxito absoluto de dicha categoría puesto que puede ser un "golpe de suerte" en la acogida que tuvo con el público. Entre los géneros que se observan que han tenido más perseverancia en el mercado son de acción, plataformas, disparos y deportes.
+**Conclusión:** De acuerdo a la revisión de valores por género se puede decir que existen valores atípicos, pero al tratarse de ventas por unidad de videojuego única en el conjunto de datos se puede deducir aquellos géneros en videojuegos que triunfaron en el mercado, pero más allá no puede determinar el éxito absoluto de dicha categoría puesto que puede ser un "golpe de suerte" en la acogida que tuvo con el público. Entre los géneros que se observan que han tenido más perseverancia en el mercado son de acción, plataformas, disparos y deportes.
 
 ```{r,eval=TRUE,echo=TRUE}
+#Detalle de ventas por plataformas en videojuegos
 plot(videogamesnewS$Platform, videogamesnewS$Global_Sales, col="blue", 
-     main = 'Ventas de videojuegos por Plataforma',  cex=0.8)
+     main = 'Ventas de videojuegos por Plataforma',
+     ylab="Ventas por millones", xlab="Clasificación por Plataforma",cex.axis=0.4,cex=0.4)
+#Detalle global de ventas por plataforma
+barplot(PlatformVideoGames,cex.axis=0.4,cex=0.4)
 ```
 
 **Conclusión:** Al tratarse de plataformas de videojuegos, se conoce la evolución de las mismas y solo aquellas que innovan en su formato de presentación y adaptación de videojuegos para dicho tipo de consola sobreviven, en base a la gráfica se puede observar que existen plataformas con ventas bajas que se pueden considerar en la actualidad como obsoletas. Se puede evidenciar el éxito de determinadas plataformas entre ellas las versiones de Play Station y las versiones de Xbox, adicional se observa el éxito que tuvo la consola de Wii en su momento.
 
 ```{r,eval=TRUE,echo=TRUE}
-plot(videogamesnewS$Publisher,videogamesnewS$Global_Sales, col="blue", 
-     main = 'Ventas de videojuegos por Editor')
+#Detalle global de Ventas por Editor
+barplot(PublisherVideoGames, cex.axis=0.4,cex=0.4,main = 'Ventas de videojuegos por Editor')
 ```
 
 **Conclusión:** De acuerdo a la revisión de ventas de editores, se evidencia aquellos con mayor éxito en el mercado, puede concluir que son aquellos que se mantienen vigentes de acuerdo al número de lanzamientos de videojuegos, lo que hay que considerar el número total de ventas puesto que pueden tener un par de juegos y figurarse entre los mejores.
 
 De acuerdo a los datos graficados, se analizarán en conjuntos con los datos obtenidos de la revisión de los subconjuntos de datos por tipos que se reflejan en las tablas con la finalidad de fundamentar los resultados obtenidos y las propuestas realizadas.
+
+**Análisis por Plataforma y Género**
+
+Una vez analizados cada uno de los editores, géneros y plataformas por separado es necesario tener en cuenta que por cada plataforma existe una forma única de jugar, por lo cual es importante segmentar datos por grupos de plataformas similares para de esta forma, analizar sus ventas y géneros. En base a lo mencionado, se procede con la segmentación de tres grupos de datos:
+
+* **Grupo 1:** PC, PS2, PS3, PS4, X360 Y XOne
+
+```{r,eval=TRUE,echo=TRUE}
+Grupo01 <- subset(videogamesnewS, videogamesnewS$Platform == "PC" |
+                    videogamesnewS$Platform == "PS2" | videogamesnewS$Platform == "PS3" |
+                    videogamesnewS$Platform == "PS4" | videogamesnewS$Platform == "X360" |
+                    videogamesnewS$Platform == "XOne")
+table(Grupo01$Genre)
+```
+
+* **Grupo 2:** Wii
+
+```{r,eval=TRUE,echo=TRUE}
+Grupo02 <- subset(videogamesnewS, videogamesnewS$Platform == "Wii")
+table(Grupo02$Genre)
+```
+
+* **Grupo 3:** DS y 3DS
+
+```{r,eval=TRUE,echo=TRUE}
+Grupo03 <- subset(videogamesnewS, videogamesnewS$Platform == "DS" |
+                    videogamesnewS$Platform == "3DS")
+table(Grupo03$Genre)
+#Revisión de ventas significativas a partir de grupos de datos segmentados en plataformas
+wilcox.test(Grupo01$Global_Sales,Grupo02$Global_Sales,paired=FALSE,conf.level=0.90)
+wilcox.test(Grupo01$Global_Sales,Grupo03$Global_Sales,paired=FALSE,conf.level=0.90)
+wilcox.test(Grupo02$Global_Sales,Grupo03$Global_Sales,paired=FALSE,conf.level=0.90)
+```
+
+De acuerdo a los resultados de ventas analizados por grupos en plataformas, entre el grupo 1 y Grupo 2 no existe mucha diferencia en cuanto al p-value, mientras que en la comparativa del grupo 1 y grupo 3 existe un valor-p elevado. En estas tres comparativas se evidencia que no cumple una hipótesis nula, lo que nos lleva a un resultado segmentado por plataforma.
 
 # 5. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
 
@@ -453,13 +493,21 @@ Con los datos obtenidos, es más fácil responder a una inquietud de una empresa e
 
 En la limpieza de datos excluimos aquellos juegos con menos ganancias y aquellos videojuegos menores del año 2007 puesto que, 10 años después la forma de jugar ha cambiado y muchas de las consolas de videojuegos ya no se encuentran disponibles en el mercado. Además, los videojuegos se ven censurados de acuerdo a su clasificación de videojuegos puesto que actualmente están enfocados para ser utilizado por el público de todas las edades y el contenido debe ser restringido. 
 
-Bien, volviendo a nuestro propósito inicial hemos analizados cada uno de los datos de nuestro DataSet en donde llegamos a las siguientes conclusiones:
+Bien, volviendo a nuestro propósito inicial hemos analizados cada uno de los datos de nuestro Conjunto de Datos, en donde llegamos a las siguientes conclusiones:
 
-* **Género de videojuego: ** De acuerdo a los datos analizados en nuestro dataset, al final solo quedaron 12 categorías como las más demandadas en los últimos 10 años. De las cuales los más demandados figuran los géneros de acción, deportes, disparos (subcategoría de acción), Juego de roles y Misceláneas. Entonces, toda empresa y persona que quiera dedicarse a la industria de videojuegos, deberá escribir su idea en base a este tipo de contenido consiguiendo de esta forma, una mayor interacción con los usuarios finales.
+* **GÉNERO: ** De acuerdo a los datos analizados en nuestro dataset, al final solo quedaron 12 categorías como las más demandadas en los últimos 10 años. De las cuales los más demandados figuran los géneros de acción, deportes, disparos (subcategoría de acción), Juego de roles y Misceláneas. 
 
-* **Plataforma del videojuego: ** Para determinar a qué plataformas debemos enfocar el videojuego, se consideró un tiempo de 10 años que toma en dejar de comercializarse una consola, este también depende del nivel de acogida que tuvo por las personas, para lo cual al momento las plataformas más rentables son PS3, XBOX 360, y Wii. A pesar que, juegos para PS4 y XOne no son tan relevantes como las primeras es importante tomar en cuenta que son las sucesoras de las primeras consolas, y deben tomarse en cuenta para evitar un doble trabajo a futuro. Para desarrollar en plataformas DS y 3DS sería más recomendable de lanzar una versión móvil del juego. En este caso PC y PS2 ya no son tomadas en cuenta, puesto que un PC debe ser de buenas características para que se ejecute con normalidad un juego y PS2 ya salió del mercado. En base al número de ventas podría considerarse o no desarrollar para estas plataformas.
+En la revisión de plataformas se identificó cambios en género de acuerdo al tipo de consola que se desea desarrollar, para lo cual se dividió las plataformas más demandadas en 3 grupos, esto de acuerdo al método de juegos y los accesorios que se disponen para manejar la plataforma que brindaN mejor experiencia al usuario, en donde se procede a recomendar lo siguiente:
 
-* **Editor del video juego: ** En la parte del editor del videojuego, ese que será el encargado de plasmar nuestra idea en gráficos y código, la calidad del mismo dependerá mucho del capital que la empresa decida invertir. Para esto, una recomendación es trabajar en conjunto con Electronic Arts, Nintento, Activision y ubisoft. Adicional también estan Take Two interactive, Sony Computer, Warner Bros y Sega. Para fundamentarse en quien contratar la empresa puede basarse en los numeros de ventas de estas empresas.
+* **Grupo 1 (PC, PS2, PS3, PS4, X360 Y XOne): ** Acción, juegos de roles, carreras y peleas.
+* **Grupo 2 (Wii): ** Deportes, acción y estrategia.
+* **Grupo 3 (DS y 3DS): ** Acción, juego de roles y simulación.
+
+Estos valores se encuentran fundamentados en ventas y aceptación de los usuarios. Hay que tener en cuenta, que para el desarrollo de cada grupo, existe la posibilidad de migrar las versiones a una nueva plafatorma disminuyendo así costos de desarrollo.
+
+* **PLATAFORMA: ** Para determinar a qué plataformas debemos enfocar el videojuego, se consideró un tiempo de 10 años que toma en dejar de comercializarse una consola, este también depende del nivel de acogida que tuvo por las personas, para lo cual al momento las plataformas más rentables son PS3, XBOX 360, y Wii. A pesar que, juegos para PS4 y XOne no son tan relevantes como las primeras es importante tomar en cuenta que son las sucesoras de las primeras consolas, y deben tomarse en cuenta para evitar un doble trabajo a futuro. Para desarrollar en plataformas DS y 3DS sería más recomendable de lanzar una versión móvil del juego. En este caso PC y PS2 ya no son tomadas en cuenta, puesto que un PC debe ser de buenas características para que se ejecute con normalidad un juego y PS2 ya salió del mercado. En base al número de ventas podría considerarse o no desarrollar para estas plataformas.
+
+* **EDITOR: ** En la parte del editor del videojuego, ese que será el encargado de plasmar nuestra idea en gráficos y código, la calidad del mismo dependerá mucho del capital que la empresa decida invertir. Para esto, una recomendación es trabajar en conjunto con Electronic Arts, Nintento, Activision y ubisoft. Adicional también estan Take Two interactive, Sony Computer, Warner Bros y Sega. Para fundamentarse en quien contratar la empresa puede basarse en los numeros de ventas de estas empresas.
 
 
 # **Exportación de datos limpios**
